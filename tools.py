@@ -38,8 +38,9 @@ def nearest_neighbours(size_x, size_y):
     n = size_x*size_y
     out = []
     if size_y == 1:
-        out = np.arange(size_x) + 1
-        out[-1] = 0
+        for i in xrange(size_x):
+            out.append([i + 1])
+        out[-1] = [0]
     else:
         for i in xrange(n):
             out.append([i-size_y + (i < size_y)*n, i - 1 + (i % size_y == 0)*size_y])
@@ -53,10 +54,11 @@ def nearest_neighbours(size_x, size_y):
 #
 def grid(size_x, size_y):
     N = size_x*size_y
+    out = []
     if size_y == 1:
-        return np.arange(size_x)
+        for i in xrange(size_x):
+            out.append([i])
     else:
-        out = []
         for i in xrange(N):
                 out.append([i//size_y,i%size_y])
     return out

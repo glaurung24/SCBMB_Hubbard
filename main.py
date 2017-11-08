@@ -4,11 +4,10 @@ import tools as t
 import hamiltonian
 
 
-print t.grid(2,3)
+H = hamiltonian.HubbardHamiltonian(4,4)
 
-#H = hamiltonian.HubbardHamiltonian(10,10)
+out = H.generate_matrix()
 
-#out = H.generate_matrix()
-
+print out
 
 #print np.linalg.eig(out)
