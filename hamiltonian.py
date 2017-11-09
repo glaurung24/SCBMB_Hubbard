@@ -41,6 +41,9 @@ class HubbardHamiltonian:
         nr_configs_down = len(configs_down)
         nr_configs_total = nr_configs_up * nr_configs_down
 
+
+        ##################### Calculation of H_1 ###########################################
+
         configs_both = []
         H_1 = np.zeros(nr_configs_total)
         for i in xrange(nr_configs_up):
@@ -52,32 +55,40 @@ class HubbardHamiltonian:
 
         H = np.diag(H_1*self.U) #TODO maybe switch to sparse matrix at some point?
 
+        ##################### Calculation of H_0 ###########################################
+        def generateSubH_0(self, configs):
+            len_bin_nr = len(bin(configs[-1]))-2
+            nr_configs = len(configs)
+            H_0 = np.zeros(nr_configs, nr_configs)
+            for ket_index in xrange(nr_configs): #TODO this part is a bit quick'n'dirty, so
+                                            # maybe optimize it at some point, e.g. don't
+                                            # use strings for doing stuff....
+                config = configs[ket_index]
+                config_str = bytearray(bin(config))[2:].zfill(len_bin_nr)
+                occupied_indexes = [x for x, v in enumerate(str(config_str)) if v == "1"]
+    #            occupied_indexes -= 2 #because of the string format
+                for index in occupied_indexes:
+                    neighbors = list_nearest_neighbors[index]
+                    for j in xrange(len(neighbors)): #TODO maybe optimize
+                        if neighbors[j] not in occupied_indexes:
+                            config_str_temp = deepcopy(config_str)
+                            config_str_temp[index] = "0"
+                            n_annihilator = config_str_temp[:index].count("1")
+                            config_str_temp[neighbors[j]] = "1"
+                            n_creator = config_str_temp[:neighbors[j]].count("1")
+                            bra_index = configs.index(int(str(config_str_temp), 2)) #... find index k of bra
+                                                                                    #TODO this might not be the fastest solution (use bisection search algorithm)
+                            sign = (-1)**(n_annihilator+n_creator) #sign of matrix element
 
-        len_bin_nr = len(bin(configs_up[-1]))-2
-        for i in xrange(nr_configs_up): #TODO this part is a bit quick'n'dirty, so
-                                        # maybe optimize it at some point, e.g. don't
-                                        # use strings for doing stuff....
-            config = configs_up[i]
-            config_str = bytearray(bin(config))[2:].zfill(len_bin_nr)
-            occupied_indexes = [x for x, v in enumerate(str(config_str)) if v == "1"]
-#            occupied_indexes -= 2 #because of the string format
-            for index in occupied_indexes:
-                neighbors = list_nearest_neighbors[index]
-                for j in xrange(len(neighbors)): #TODO maybe optimize
-                    if neighbors[j] not in occupied_indexes:
-                        config_str_temp = deepcopy(config_str)
-                        config_str_temp[index] = "0"
-                        config_str_temp[neighbors[j]] = "1"
-
-                        k = configs_up.index(int(str(config_str_temp), 2))
-                        s = 1 #TODO, find right sign...
-
-                        for l in xrange(nr_configs_up): #does not generate hermitian hamiltonian...
-                            #write into the Hamiltonian, but I am not sure yet if
-                            # right subspaces get filled with this function...
-                            #TODO
-                            H[k + l*nr_configs_down, i + l*nr_configs_down] = \
-                                                                    - self.t*s
+                            print sign
+                            H_0[bra_index, ket_index] = (-1)* self.t*sign
+#                            for l in xrange(nr_configs_up): #does not generate hermitian hamiltonian...
+#                                #write into the Hamiltonian, but I am not sure yet if
+#                                # right subspaces get filled with this function...
+#                                #TODO
+#                                H[bra_index + l*nr_configs_down, ket_index + l*nr_configs_down] = \
+#                                                                        - self.t*sign
+            return H_0
 
 
                         #do the jump, ask which config index k -> H_ki = -t * s
