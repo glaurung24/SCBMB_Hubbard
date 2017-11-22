@@ -28,7 +28,7 @@ class HubbardHamiltonian:
 
         self.nr_spins_up = nr_up
         self.nr_spins_down = nr_down
-        self.U = 0
+        self.U = 1
         self.t = 1
 
 
@@ -111,15 +111,13 @@ class HubbardHamiltonian:
             dim_down = np.shape(h_d)[0]
             dim = dim_up * dim_down
             h_0 = np.zeros([dim, dim])
-            print dim_up, dim_down
 
             for i in xrange(dim):
                 for j in xrange(dim):
-                    i_up = i // dim_up
-                    j_up = j // dim_up
+                    i_up = i // dim_down #TODO check if up and down should be flipped
+                    j_up = j // dim_down
                     i_down = i % dim_down
                     j_down = j % dim_down
-                    print i, j
                     if i_up == j_up:
                         h_0[i, j] += h_d[i_down, j_down]
                     if i_down == j_down:
