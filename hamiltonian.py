@@ -111,6 +111,7 @@ class HubbardHamiltonian:
             dim_down = np.shape(h_d)[0]
             dim = dim_up * dim_down
             h_0 = np.zeros([dim, dim])
+            print dim_up, dim_down
 
             for i in xrange(dim):
                 for j in xrange(dim):
@@ -118,6 +119,7 @@ class HubbardHamiltonian:
                     j_up = j // dim_up
                     i_down = i % dim_down
                     j_down = j % dim_down
+                    print i, j
                     if i_up == j_up:
                         h_0[i, j] += h_d[i_down, j_down]
                     if i_down == j_down:
