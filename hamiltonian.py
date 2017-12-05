@@ -63,18 +63,23 @@ class HubbardHamiltonian:
         
         self.values_H = H_1*self.U
         
+        print 'generated H1'
+        
 #        self.H = coo_matrix((self.values_H, (self.ind_row, self.ind_col))) #TODO maybe switch to sparse matrix at some point?
 
         
         ################ Filling H with H_0 #########################################
 
         subH_0_up = self.generateSubH_0(configs_up)
+        print 'generated H0 up'
         subH_0_down = self.generateSubH_0(configs_down)
+        print 'generated H0 down'
 
-        print subH_0_up
-        print subH_0_down
+#        print subH_0_up
+#        print subH_0_down
 
         self.merge_h_0(subH_0_up, subH_0_down)
+        print 'merged all sub H_0'
         self.H = coo_matrix((self.values_H, (self.ind_row, self.ind_col)))
         return self.H
 
