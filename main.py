@@ -4,10 +4,12 @@ import tools as t
 import hamiltonian
 
 
-H = hamiltonian.HubbardHamiltonian(4,4)
+H = hamiltonian.HubbardHamiltonian(3,1, 2, 1)
 
 out = H.generate_matrix()
 
-print out
+print out.toarray()
+
+print np.linalg.eigh(out.toarray())
 
 #print np.linalg.eig(out)

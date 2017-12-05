@@ -30,6 +30,7 @@ class HubbardHamiltonian:
         self.nr_spins_down = nr_down
         self.U = 1
         self.t = 1
+        
 
 
 
@@ -55,19 +56,27 @@ class HubbardHamiltonian:
                 H_1[counter] = bin(configs_up[i] & configs_down[j]).count("1")
                 counter += 1
 
-
+        
 #        H =
-        H = np.diag(H_1*self.U) #TODO maybe switch to sparse matrix at some point?
+        self.ind_row = np.arange(len(H_1))
+        self.ind_col = deepcopy(self.ind_row)
+        
+        self.values_H = H_1*self.U
+        
+#        self.H = coo_matrix((self.values_H, (self.ind_row, self.ind_col))) #TODO maybe switch to sparse matrix at some point?
 
+        
         ################ Filling H with H_0 #########################################
 
         subH_0_up = self.generateSubH_0(configs_up)
         subH_0_down = self.generateSubH_0(configs_down)
 
-        H_0 = self.merge_h_0(subH_0_up, subH_0_down)
+        print subH_0_up
+        print subH_0_down
 
-        H += H_0
-        return H
+        self.merge_h_0(subH_0_up, subH_0_down)
+        self.H = coo_matrix((self.values_H, (self.ind_row, self.ind_col)))
+        return self.H
 
         ##################### Calculation of H_0 ####################################
     def generateSubH_0(self, configs):
@@ -110,7 +119,7 @@ class HubbardHamiltonian:
             dim_up = np.shape(h_u)[0]
             dim_down = np.shape(h_d)[0]
             dim = dim_up * dim_down
-            h_0 = np.zeros([dim, dim])
+#            h_0 = np.zeros([dim, dim])
 
             for i in xrange(dim):
                 for j in xrange(dim):
@@ -119,11 +128,15 @@ class HubbardHamiltonian:
                     i_down = i % dim_down
                     j_down = j % dim_down
                     if i_up == j_up:
-                        h_0[i, j] += h_d[i_down, j_down]
+                        self.values_H = np.append(self.values_H, h_d[i_down, j_down])
+                        self.ind_row = np.append(self.ind_row, i)
+                        self.ind_col = np.append(self.ind_col, j)
                     if i_down == j_down:
-                        h_0[i, j] += h_u[i_up, j_up]
+                        self.values_H = np.append(self.values_H, h_u[i_up, j_up])
+                        self.ind_row = np.append(self.ind_row, i)
+                        self.ind_col = np.append(self.ind_col, j)
 
-            return h_0
+#            return h_0
 
 
                     #do the jump, ask which config index k -> H_ki = -t * s
