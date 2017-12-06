@@ -30,7 +30,7 @@ class HubbardHamiltonian:
         self.nr_spins_down = nr_down
         self.U = 1
         self.t = 1
-        
+
 
 
 
@@ -56,18 +56,18 @@ class HubbardHamiltonian:
                 H_1[counter] = bin(configs_up[i] & configs_down[j]).count("1")
                 counter += 1
 
-        
+
 #        H =
         self.ind_row = np.arange(len(H_1))
         self.ind_col = deepcopy(self.ind_row)
-        
+
         self.values_H = H_1*self.U
-        
+
         print 'generated H1'
-        
+
 #        self.H = coo_matrix((self.values_H, (self.ind_row, self.ind_col))) #TODO maybe switch to sparse matrix at some point?
 
-        
+
         ################ Filling H with H_0 #########################################
 
         subH_0_up = self.generateSubH_0(configs_up)
@@ -127,19 +127,23 @@ class HubbardHamiltonian:
 #            h_0 = np.zeros([dim, dim])
 
             for i in xrange(dim):
+                i_up = i // dim_down
+                i_down = i % dim_down
                 for j in xrange(dim):
-                    i_up = i // dim_down #TODO check if up and down should be flipped
+                    #TODO check if up and down should be flipped
                     j_up = j // dim_down
-                    i_down = i % dim_down
                     j_down = j % dim_down
+                    #TODO allocate the three vectors for the sparse matrices first
                     if i_up == j_up:
-                        self.values_H = np.append(self.values_H, h_d[i_down, j_down])
-                        self.ind_row = np.append(self.ind_row, i)
-                        self.ind_col = np.append(self.ind_col, j)
+                        if h_d[i_down, j_down] != 0:
+                            self.values_H = np.append(self.values_H, h_d[i_down, j_down])
+                            self.ind_row = np.append(self.ind_row, i)
+                            self.ind_col = np.append(self.ind_col, j)
                     if i_down == j_down:
-                        self.values_H = np.append(self.values_H, h_u[i_up, j_up])
-                        self.ind_row = np.append(self.ind_row, i)
-                        self.ind_col = np.append(self.ind_col, j)
+                        if h_u[i_up, j_up] != 0:
+                            self.values_H = np.append(self.values_H, h_u[i_up, j_up])
+                            self.ind_row = np.append(self.ind_row, i)
+                            self.ind_col = np.append(self.ind_col, j)
 
 #            return h_0
 
