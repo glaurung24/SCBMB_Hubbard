@@ -4,7 +4,7 @@ import tools as t
 import hamiltonian
 
 
-H = hamiltonian.HubbardHamiltonian(4,4)
+H = hamiltonian.HubbardHamiltonian(4,4, 8, 8)
 
 out = H.generate_matrix()
 
