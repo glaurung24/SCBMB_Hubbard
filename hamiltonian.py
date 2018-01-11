@@ -71,6 +71,7 @@ class HubbardHamiltonian:
         ################ Filling H with H_0 #########################################
 
         subH_0_up = self.generateSubH_0(configs_up)
+#        print subH_0_up.toarray()
         print 'generated H0 up'
         subH_0_down = self.generateSubH_0(configs_down)
         print 'generated H0 down'
@@ -78,9 +79,13 @@ class HubbardHamiltonian:
 #        print subH_0_up
 #        print subH_0_down
 
-        self.merge_h_0(subH_0_up, subH_0_down)
+        self.merge_h_0(subH_0_up.toarray(), subH_0_down.toarray())
+#        self.merge_h_0(subH_0_up, subH_0_down)
         print 'merged all sub H_0'
-        self.H = coo_matrix((self.values_H, (self.ind_row, self.ind_col)))
+
+        N_total_configs = len(configs_up)*len(configs_down)
+        self.H = coo_matrix((self.values_H, (self.ind_row, self.ind_col)), \
+                    shape=([N_total_configs, N_total_configs]))
         return self.H
 
         ##################### Calculation of H_0 ####################################
@@ -90,13 +95,15 @@ class HubbardHamiltonian:
         
         LNN = t.nearest_neighbours(self.size_x, self.size_y)
 #        print LNN
-        
         H_0 = np.zeros([nr_configs, nr_configs])
         
+        ind_H_0_row = []
+        ind_H_0_col = []
+        val_H_0 = []                
         for i in xrange(nr_configs):     # i ... i-th configuration
             bits_0 = configs[i]
             for site in xrange(self.system_size):       # site  ... current site
-                for neigh in xrange(2):  # neigh ... Index for upper or left NN
+                for neigh in xrange(2):  # neigh ... Index for upper or left NN #TODO does not work for 1D system...
                     nn = LNN[site][neigh]
         
                     if bits_0 >> site & 1 != bits_0 >> nn & 1:
@@ -121,9 +128,19 @@ class HubbardHamiltonian:
                                 elements = elements[cut:]
                                 nr_elements -= cut
                                 j += cut
+#                        ind_H_0_row.append(i)
+#                        ind_H_0_col.append(j)
+#                        val_H_0.append(-s*self.t)
+                        H_0[i, j] = -s*self.t #TODO I suspect that a double counting is happening here...
         
-                        H_0[i, j] = -s*self.t
-        return H_0
+#        ind_H_0_row = np.array(ind_H_0_row, dtype=int)
+#        ind_H_0_col = np.array(ind_H_0_col, dtype=int)
+#        val_H_0 = np.array(val_H_0, dtype=float)
+#        print ind_H_0_row, ind_H_0_col, val_H_0
+#        return H_0
+#        return coo_matrix((val_H_0, (ind_H_0_row, ind_H_0_col)), shape= \
+#                        [nr_configs, nr_configs])
+        return coo_matrix(H_0)
         
         
         
