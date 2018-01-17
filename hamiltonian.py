@@ -28,7 +28,7 @@ class HubbardHamiltonian:
 
         self.nr_spins_up = nr_up
         self.nr_spins_down = nr_down
-        self.U = 10
+        self.U = 1.0
         self.t = 0.5
 
 
@@ -76,7 +76,10 @@ class HubbardHamiltonian:
         col = np.concatenate((col, H_0.col))
 
         H = coo_matrix((data, (row, col)), shape=(nr_configs_total, nr_configs_total))
-        return coo_matrix.tocsr(H)
+        return H#coo_matrix.tocsr(H)
+    
+
+
 
         ##################### Calculation of H_0 ####################################
     def generateSubH_0(self, configs):
@@ -88,11 +91,16 @@ class HubbardHamiltonian:
         row = []
         col = []
         data = []
+        
+        if self.size_y == 1:
+            n_neigbhours_per_site = 1
+        else:
+            n_neigbhours_per_site = 2
 
         for i in xrange(nr_configs):  # i ... i-th configuration
             bits_0 = configs[i]
             for site in xrange(n):  # site  ... current site
-                for neigh in xrange(2):  # neigh ... Index for upper or left NN
+                for neigh in xrange(n_neigbhours_per_site):  # neigh ... Index for upper or left NN
                     nn = LNN[site][neigh]
 
                     bit_s = bits_0 >> site & 1
@@ -110,22 +118,11 @@ class HubbardHamiltonian:
                         s = (-1) ** setbits
 
                         # bisection search algorithm
-                        notfound = True
-                        j = 0
+                        
+                       
                         elements = configs
                         nr_elements = nr_configs
-                        while notfound:
-                            cut = nr_elements // 2
-                            if bits == elements[cut]:
-                                notfound = False
-                                j += cut
-                            elif bits < elements[cut]:
-                                elements = elements[:cut]
-                                nr_elements = cut
-                            else:  # bits > elements[cut]:
-                                elements = elements[cut:]
-                                nr_elements -= cut
-                                j += cut
+                        j = self.bisect(elements, nr_elements, bits)
 
                         row.append(i)
                         col.append(j)
@@ -164,5 +161,19 @@ class HubbardHamiltonian:
                     #do the jump, ask which config index k -> H_ki = -t * s
                     # determine s...(sign)
 
-
-
+    def bisect(self, elements, nr_elements, bits):
+        notfound = True
+        j = 0
+        while notfound:
+            cut = nr_elements // 2
+            if bits == elements[cut]:
+                notfound = False
+                j += cut
+            elif bits < elements[cut]:
+                elements = elements[:cut]
+                nr_elements = cut
+            else:  # bits > elements[cut]:
+                elements = elements[cut:]
+                nr_elements -= cut
+                j += cut
+        return j
