@@ -62,3 +62,20 @@ def grid(size_x, size_y):
         for i in xrange(N):
                 out.append([i//size_y,i%size_y])
     return out
+
+def bisect(elements, nr_elements, bits):
+    notfound = True
+    j = 0
+    while notfound:
+        cut = nr_elements // 2
+        if bits == elements[cut]:
+            notfound = False
+            j += cut
+        elif bits < elements[cut]:
+            elements = elements[:cut]
+            nr_elements = cut
+        else:  # bits > elements[cut]:
+            elements = elements[cut:]
+            nr_elements -= cut
+            j += cut
+    return j

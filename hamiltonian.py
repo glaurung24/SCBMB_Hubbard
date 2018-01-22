@@ -122,7 +122,7 @@ class HubbardHamiltonian:
 
                         elements = configs
                         nr_elements = nr_configs
-                        j = self.bisect(elements, nr_elements, bits)
+                        j = t.bisect(elements, nr_elements, bits)
 
                         row.append(i)
                         col.append(j)
@@ -161,19 +161,4 @@ class HubbardHamiltonian:
                     #do the jump, ask which config index k -> H_ki = -t * s
                     # determine s...(sign)
 
-    def bisect(self, elements, nr_elements, bits):
-        notfound = True
-        j = 0
-        while notfound:
-            cut = nr_elements // 2
-            if bits == elements[cut]:
-                notfound = False
-                j += cut
-            elif bits < elements[cut]:
-                elements = elements[:cut]
-                nr_elements = cut
-            else:  # bits > elements[cut]:
-                elements = elements[cut:]
-                nr_elements -= cut
-                j += cut
-        return j
+
