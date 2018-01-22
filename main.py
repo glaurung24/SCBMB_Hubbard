@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from scipy.sparse.linalg import eigsh
 
 
-H = hamiltonian.HubbardHamiltonian(2, 1, 1, 1)
+H = hamiltonian.HubbardHamiltonian(2, 4, 4, 4)
 out = H.generate_matrix()
 
 print "done"
@@ -21,8 +21,8 @@ def eig_normal(M):
 
 
 def eig_sparse(M):
-    n_eigenvals = 3
-    eigvals, eigvecs = eigsh(M, n_eigenvals)
+    n_eigenvals = 30
+    eigvals, eigvecs = eigsh(M, n_eigenvals, which='SA')
 
     return eigvals, eigvecs
 
@@ -33,21 +33,22 @@ def wrapper(func, *args, **kwargs):
     return wrapped
 
 
-wrapper_n = wrapper(eig_normal, out)
-wrapper_s = wrapper(eig_sparse, out)
+#wrapper_n = wrapper(eig_normal, out)
+#wrapper_s = wrapper(eig_sparse, out)
 
 #print "normal: ", timeit.timeit(wrapper_n, number=1)
 #print "sparse: ", timeit.timeit(wrapper_s, number=1)
 
-eigvals, eigvecs = eig_normal(out)
-print out.toarray()
+eigvals, eigvecs = eig_sparse(out)
+#print out.toarray()
 #n_eigenvals = 1295
 #eigvals2, eigvecs2 = eigsh(out, n_eigenvals) #Lanzcos (or Arnoldi?)
 print eigvals
+print np.imag(eigvecs[:, 0])
 #print eigvals2
 
 plt.hist(eigvals, 11)  # arguments are passed to np.histogram
-plt.title("DOS")
+#plt.title("DOS")
 plt.show()
 
 

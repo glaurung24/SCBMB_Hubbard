@@ -28,8 +28,8 @@ class HubbardHamiltonian:
 
         self.nr_spins_up = nr_up
         self.nr_spins_down = nr_down
-        self.U = 1.0
-        self.t = 0.5
+        self.U = 4.0
+        self.t = 1.0
 
 
 
@@ -77,7 +77,7 @@ class HubbardHamiltonian:
 
         H = coo_matrix((data, (row, col)), shape=(nr_configs_total, nr_configs_total))
         return H#coo_matrix.tocsr(H)
-    
+
 
 
 
@@ -91,7 +91,7 @@ class HubbardHamiltonian:
         row = []
         col = []
         data = []
-        
+
         if self.size_y == 1:
             n_neigbhours_per_site = 1
         else:
@@ -118,8 +118,8 @@ class HubbardHamiltonian:
                         s = (-1) ** setbits
 
                         # bisection search algorithm
-                        
-                       
+
+
                         elements = configs
                         nr_elements = nr_configs
                         j = self.bisect(elements, nr_elements, bits)
