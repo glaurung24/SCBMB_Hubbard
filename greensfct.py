@@ -30,6 +30,9 @@ def creatorOnWavefct(indexes, wavefct, old_config_inp):
 
     dim_sup_space = len(old_configs)
     n = dim_sup_space
+    
+    dim_new_hilbert_space = len(old_configs)*len(new_configs)
+    new_wave_fct = np.zeros(dim_new_hilbert_space)
     for i in xrange(len(old_configs)):
         old_config = bytearray(bin(old_configs[i]))[2:].zfill(n)
         old_config = str(old_config)
