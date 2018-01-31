@@ -144,6 +144,9 @@ class HubbardHamiltonian:
             col = []
             data = []
 
+		#Ordering of configurations in the Hilbert space is:
+		#{up0,down0, up0down1, ..., up0downn, up1down0,...
+
             for k in xrange(dim_up):
                 row = np.concatenate((row, h_d.row + k * dim_down))
                 col = np.concatenate((col,  h_d.col + k * dim_down))
